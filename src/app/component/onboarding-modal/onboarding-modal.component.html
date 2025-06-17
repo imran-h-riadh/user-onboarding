@@ -100,7 +100,7 @@
       />
     </div>
 
-    <div class="field col-12">
+    <!-- <div style="width: 300px; height: 300px">
       <label>Location/Address*</label>
       <google-map
         height="400px"
@@ -111,6 +111,10 @@
       >
       </google-map>
       <p *ngIf="locationName"><strong>Location:</strong> {{ locationName }}</p>
+    </div> -->
+
+    <div style="width: 500px; height: 500px; margin-bottom: 40px">
+      <app-gmap />
     </div>
 
     <div class="field col-12">

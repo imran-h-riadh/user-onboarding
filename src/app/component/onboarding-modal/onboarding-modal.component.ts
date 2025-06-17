@@ -9,6 +9,7 @@ import { FormsModule } from '@angular/forms';
 import { RadioButtonModule } from 'primeng/radiobutton';
 import { HttpClientModule } from '@angular/common/http';
 import { GoogleMapsModule } from '@angular/google-maps';
+import { GmapComponent } from '../gmap/gmap.component';
 
 @Component({
   selector: 'app-onboarding-modal',
@@ -23,7 +24,8 @@ import { GoogleMapsModule } from '@angular/google-maps';
     FormsModule,
     RadioButtonModule,
     HttpClientModule,
-    GoogleMapsModule
+    GoogleMapsModule,
+    GmapComponent
   ],
   templateUrl: './onboarding-modal.component.html',
   styleUrls: ['./onboarding-modal.component.css']

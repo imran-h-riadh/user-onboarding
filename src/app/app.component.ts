@@ -44,6 +44,7 @@ interface UserType {
 }
 
 interface Company {
+  id: number;
   name: string;
   email: string;
   dateAdded: Date;
@@ -78,9 +79,7 @@ interface Company {
     OnboardingModalComponent,
     CompanyModalComponent,
     HttpClientModule,
-    LocationComponent,
-    GmapComponent,
-    SelectButtonModule
+    SelectButtonModule,
   ],
   templateUrl: './app.component.html',
   styleUrls: ['./app.component.css']
@@ -176,6 +175,7 @@ export class AppComponent implements OnInit {
 
   companies: Company[] = [
     {
+      id: 1,
       name: 'Tech Innovators Inc.',
       email: 'info@techinnovators.com',
       dateAdded: new Date('2023-01-10T09:00:00Z'),
@@ -193,6 +193,7 @@ export class AppComponent implements OnInit {
       vatNumber: ''
     },
     {
+      id: 1,
       name: 'Global Solutions Ltd.',
       email: 'contact@globalsolutions.com',
       dateAdded: new Date('2023-03-15T11:30:00Z'),
