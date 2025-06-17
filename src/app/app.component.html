@@ -1,5 +1,3 @@
-<!-- <app-gmap /> -->
-<!-- <app-location /> -->
 <div class="container mx-auto p-4">
   <h2 class="text-2xl font-bold mb-4">Member Type</h2>
   <div class="mb-6">
@@ -8,186 +6,92 @@
       [(ngModel)]="selectedUserType"
       optionLabel="name"
       placeholder="Select a Member Type"
-      class=""
     ></p-selectButton>
   </div>
 
-  <!-- Users Table -->
-  <div *ngIf="shouldShowUsersTable()" class="mb-8">
-    <h2 class="text-2xl font-bold mb-4">Users</h2>
-    <p-table
-      #dt
-      [value]="getUsers()"
-      dataKey="emailAddress"
-      [rows]="10"
-      [rowsPerPageOptions]="[10, 25, 50]"
-      [loading]="loading"
-      [paginator]="true"
-      [globalFilterFields]="['fullName', 'companyName']"
-      [sortField]="'dateAdded'"
-      [sortOrder]="-1"
-      styleClass="p-datatable-striped p-datatable-gridlines"
-    >
-      <ng-template pTemplate="caption">
-        <div class="flex flex-col md:flex-row gap-2">
-          <p-button
-            label="Clear"
-            [outlined]="true"
-            icon="pi pi-filter-slash"
-            (click)="clear()"
-            class="w-full md:w-auto"
+  <p-table
+    #dt
+    [value]="getUsers()"
+    dataKey="id"
+    [rows]="10"
+    [rowsPerPageOptions]="[10, 25, 50]"
+    [loading]="loading"
+    [paginator]="true"
+    [globalFilterFields]="['fullName', 'company.name']"
+    sortField="dateAdded"
+    [sortOrder]="-1"
+    styleClass="p-datatable-striped p-datatable-gridlines"
+  >
+    <ng-template pTemplate="caption">
+      <div class="flex flex-col md:flex-row gap-2">
+        <p-button
+          label="Clear"
+          [outlined]="true"
+          icon="pi pi-filter-slash"
+          (click)="clear()"
+          class="w-full md:w-auto"
+        />
+        <p-iconField iconPosition="left" class="w-full md:w-auto md:ml-auto">
+          <p-inputIcon>
+            <i class="pi pi-search"></i>
+          </p-inputIcon>
+          <input
+            pInputText
+            type="text"
+            (input)="applyFilter($event)"
+            placeholder="Search by name/company"
+            class="w-full"
           />
-          <p-iconField iconPosition="left" class="w-full md:w-auto md:ml-auto">
-            <p-inputIcon>
-              <i class="pi pi-search"></i>
-            </p-inputIcon>
-            <input
-              pInputText
-              type="text"
-              (input)="applyFilter($event)"
-              placeholder="Search by name/company"
-              class="w-full"
-            />
-          </p-iconField>
-        </div>
-      </ng-template>
-      <ng-template pTemplate="header">
-        <tr>
-          <th pSortableColumn="fullName" style="min-width: 15rem">
-            <div class="flex items-center">
-              Full Name
-              <p-sortIcon field="fullName"></p-sortIcon>
-            </div>
-          </th>
-          <th style="min-width: 15rem">
-            <div class="flex items-center">Email</div>
-          </th>
-          <th pSortableColumn="companyName" style="min-width: 15rem">
-            <div class="flex items-center">
-              Company
-              <p-sortIcon field="companyName"></p-sortIcon>
-            </div>
-          </th>
-          <th pSortableColumn="dateAdded" style="min-width: 10rem">
-            <div class="flex items-center">
-              Date Added
-              <p-sortIcon field="dateAdded"></p-sortIcon>
-            </div>
-          </th>
-        </tr>
-      </ng-template>
-      <ng-template pTemplate="body" let-user>
-        <tr
-          (click)="showUserDetails(user)"
-          class="cursor-pointer hover:bg-gray-100"
-        >
-          <td>{{ user.fullName }}</td>
-          <td>{{ user.emailAddress }}</td>
-          <td>{{ user.companyName || "N/A" }}</td>
-          <td>{{ user.dateAdded | date : "mediumDate" }}</td>
-        </tr>
-      </ng-template>
-      <ng-template pTemplate="emptymessage">
-        <tr>
-          <td colspan="4" class="text-center py-4">No users found.</td>
-        </tr>
-      </ng-template>
-    </p-table>
-  </div>
+        </p-iconField>
+      </div>
+    </ng-template>
 
-  <!-- Companies Table -->
-  <div *ngIf="shouldShowCompaniesTable()" class="mb-8">
-    <h2 class="text-2xl font-bold mb-4">Companies</h2>
-    <p-table
-      #companyTable
-      [value]="companies"
-      [value]="getCompanies()"
-      dataKey="email"
-      [rows]="10"
-      [rowsPerPageOptions]="[10, 25, 50]"
-      [loading]="loading"
-      [paginator]="true"
-      [globalFilterFields]="['name', 'email']"
-      [sortField]="'dateAdded'"
-      [sortOrder]="-1"
-      styleClass="p-datatable-striped p-datatable-gridlines"
-    >
-      <ng-template pTemplate="caption">
-        <div class="flex flex-col md:flex-row gap-2">
-          <p-button
-            label="Clear"
-            [outlined]="true"
-            icon="pi pi-filter-slash"
-            (click)="clearCompanyFilter()"
-            class="w-full md:w-auto"
-          />
-          <p-iconField iconPosition="left" class="w-full md:w-auto md:ml-auto">
-            <p-inputIcon>
-              <i class="pi pi-search"></i>
-            </p-inputIcon>
-            <input
-              pInputText
-              type="text"
-              (input)="applyCompanyFilter($event)"
-              placeholder="Search by name/email"
-              class="w-full"
-            />
-          </p-iconField>
-        </div>
-      </ng-template>
-      <ng-template pTemplate="header">
-        <tr>
-          <th pSortableColumn="name" style="min-width: 15rem">
-            <div class="flex items-center">
-              Company Name
-              <p-sortIcon field="name"></p-sortIcon>
-            </div>
-          </th>
-          <th style="min-width: 15rem">
-            <div class="flex items-center">Email</div>
-          </th>
-          <th pSortableColumn="description" style="min-width: 15rem">
-            <div class="flex items-center">
-              Description
-              <p-sortIcon field="description"></p-sortIcon>
-            </div>
-          </th>
-          <th pSortableColumn="dateAdded" style="min-width: 10rem">
-            <div class="flex items-center">
-              Date Added
-              <p-sortIcon field="dateAdded"></p-sortIcon>
-            </div>
-          </th>
-        </tr>
-      </ng-template>
-      <ng-template pTemplate="body" let-company>
-        <tr
-          (click)="showCompanyDetails(company)"
-          class="cursor-pointer hover:bg-gray-100"
-        >
-          <td>{{ company.name }}</td>
-          <td>{{ company.email }}</td>
-          <td>{{ company.description || "N/A" }}</td>
-          <td>{{ company.dateAdded | date : "mediumDate" }}</td>
-        </tr>
-      </ng-template>
-      <ng-template pTemplate="emptymessage">
-        <tr>
-          <td colspan="4" class="text-center py-4">No companies found.</td>
-        </tr>
-      </ng-template>
-    </p-table>
-  </div>
-</div>
+    <ng-template pTemplate="header">
+      <tr>
+        <th pSortableColumn="fullName" style="min-width: 10rem">
+          <div class="flex items-center">
+            Name
+            <p-sortIcon field="fullName"></p-sortIcon>
+          </div>
+        </th>
+        <th style="min-width: 15rem">Email</th>
+        <th pSortableColumn="company.name" style="min-width: 15rem">
+          <div class="flex items-center">
+            Company Name
+            <p-sortIcon field="company.name"></p-sortIcon>
+          </div>
+        </th>
+        <th pSortableColumn="dateAdded" style="min-width: 10rem">
+          <div class="flex items-center">
+            Date Added
+            <p-sortIcon field="dateAdded"></p-sortIcon>
+          </div>
+        </th>
+      </tr>
+    </ng-template>
 
-<app-onboarding-modal
+    <ng-template pTemplate="body" let-user>
+      <tr
+        (click)="showUserDetails(user)"
+        class="cursor-pointer hover:bg-gray-100"
+      >
+        <td>{{ user.fullName }}</td>
+        <td>{{ user.emailAddress }}</td>
+        <td>{{ user.hasCompanyInfo ? user.company?.name : "N/A" }}</td>
+        <td>{{ user.dateAdded | date : "mediumDate" }}</td>
+      </tr>
+    </ng-template>
+
+    <ng-template pTemplate="emptymessage">
+      <tr>
+        <td colspan="4" class="text-center py-4">No users found.</td>
+      </tr>
+    </ng-template>
+  </p-table>
+
+  <!-- <app-onboarding-modal
   [user]="selectedUser"
   [(visible)]="modalVisible"
-  (save)="onUserSaved($event)"
-></app-onboarding-modal>
-
-<app-company-modal
-  [company]="selectedCompany"
-  [(visible)]="companyModalVisible"
-  (save)="onCompanySaved($event)"
-></app-company-modal>
+  (saveConfirmed)="onUserSaved($event)"
+></app-onboarding-modal> -->
+</div>

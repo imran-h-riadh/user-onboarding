@@ -1,133 +1,359 @@
 <p-dialog
   [visible]="visible"
   (visibleChange)="visibleChange.emit($event)"
-  [style]="{ width: '80vw' }"
+  [style]="{ width: '90vw', maxWidth: '1200px' }"
   header="User Details"
   [draggable]="true"
   [resizable]="true"
+  [modal]="true"
 >
-  <div *ngIf="user" class="p-fluid grid p-4">
-    <div class="field col-12 md:col-6">
-      <label for="firstName">First Name*</label>
-      <input
-        pInputText
-        id="firstName"
-        [(ngModel)]="user.firstName"
-        maxlength="50"
-        required
-      />
-    </div>
-    <div class="field col-12 md:col-6">
-      <label for="lastName">Last Name*</label>
-      <input
-        pInputText
-        id="lastName"
-        [(ngModel)]="user.lastName"
-        maxlength="50"
-        required
-      />
-    </div>
+  <p-toast></p-toast>
 
-    <div class="field col-12">
-      <label for="email">Email Address</label>
-      <input pInputText id="email" [ngModel]="user.email" readonly />
-    </div>
-
-    <div class="field col-12">
-      <label>Subscription Model*</label>
-      <div class="flex flex-column gap-3">
-        <div
-          *ngFor="let option of subscriptionOptions"
-          class="flex align-items-center"
-        >
-          <p-radioButton
-            [inputId]="option.value"
-            name="subscription"
-            [value]="option.value"
-            [(ngModel)]="user.subscriptionModel"
-            (onClick)="user.subscriptionInfo = option"
-          >
-          </p-radioButton>
-          <label [for]="option.value" class="ml-2">
-            {{ option.label }} ({{ option.credits | number }} Credits/year)
-          </label>
+  <div *ngIf="user" class="p-fluid grid p-4 gap-3">
+    <!-- Personal Information Section -->
+    <div class="col-12">
+      <h3 class="text-lg font-bold mb-3">Personal Information</h3>
+      <div class="grid">
+        <div class="field col-12 md:col-6">
+          <label for="firstName">First Name*</label>
+          <input
+            pInputText
+            id="firstName"
+            [(ngModel)]="user.firstName"
+            maxlength="50"
+            required
+          />
         </div>
+        <div class="field col-12 md:col-6">
+          <label for="lastName">Last Name*</label>
+          <input
+            pInputText
+            id="lastName"
+            [(ngModel)]="user.lastName"
+            maxlength="50"
+            required
+          />
+        </div>
+        <div class="field col-12">
+          <label for="email">Email Address</label>
+          <input pInputText id="email" [ngModel]="user.emailAddress" readonly />
+        </div>
+      </div>
+    </div>
+
+    <!-- Subscription Information Section -->
+    <div class="col-12">
+      <h3 class="text-lg font-bold mb-3">Subscription Information</h3>
+      <div class="field col-12">
+        <label>Subscription Model*</label>
+        <div class="flex flex-column gap-3">
+          <div
+            *ngFor="let option of subscriptionOptions"
+            class="flex align-items-center"
+          >
+            <p-radioButton
+              [inputId]="option.value"
+              name="subscription"
+              [value]="option.value"
+              [(ngModel)]="user.subscriptionModel"
+              (onClick)="user.subscriptionInfo = option"
+            >
+            </p-radioButton>
+            <label [for]="option.value" class="ml-2">
+              {{ option.label }} ({{ option.credits | number }} Credits/year)
+            </label>
+          </div>
+        </div>
+
+        <div
+          *ngIf="user.subscriptionInfo"
+          class="mt-3 p-3 surface-100 border-round"
+        >
+          <h4>Subscription Details</h4>
+          <p>Credits: {{ user.subscriptionInfo.credits | number }}/year</p>
+          <p>
+            Maximum Active Bookings: {{ user.subscriptionInfo.maxBookings }}
+          </p>
+          <p>Slots per Booking: {{ user.subscriptionInfo.slots }}</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Profile Information Section -->
+    <div class="col-12">
+      <h3 class="text-lg font-bold mb-3">Profile Information</h3>
+      <div class="grid">
+        <div class="field col-12 md:col-6">
+          <label>Profile Image</label>
+          <p-fileUpload
+            mode="basic"
+            name="profileImage"
+            accept="image/*"
+            [maxFileSize]="maxProfileImageSize"
+            (onSelect)="onProfileImageUpload($event)"
+            chooseLabel="Upload Image"
+          >
+          </p-fileUpload>
+          <small class="p-error">Max 1MB, JPG/PNG</small>
+          <div *ngIf="user.profileImage" class="mt-2">
+            <img
+              [src]="getImageUrl(user.profileImage)"
+              alt="Profile"
+              class="w-10rem h-10rem object-cover border-round"
+            />
+          </div>
+        </div>
+
+        <div class="field col-12 md:col-6">
+          <label for="position">Position</label>
+          <input
+            pInputText
+            id="position"
+            [(ngModel)]="user.position"
+            maxlength="50"
+          />
+        </div>
+
+        <div class="field col-12 md:col-6">
+          <label for="phone">Contact Phone Number*</label>
+          <input
+            pInputText
+            id="phone"
+            [(ngModel)]="user.phoneNumber"
+            maxlength="20"
+            required
+          />
+        </div>
+
+        <div class="field col-12 md:col-6">
+          <label for="language">Language Preference*</label>
+          <p-dropdown
+            [options]="languageOptions"
+            [(ngModel)]="user.languagePreference"
+            placeholder="Select Language"
+            optionLabel="label"
+            optionValue="value"
+            required
+          >
+          </p-dropdown>
+        </div>
+
+        <div class="field col-12">
+          <label for="address">Location / Address*</label>
+          <input pInputText id="address" [(ngModel)]="user.address" required />
+          <div class="mt-2 border-round overflow-hidden" style="height: 300px">
+            <google-map
+              [center]="center"
+              [zoom]="zoom"
+              (mapClick)="onMapClick($event)"
+            >
+              <map-marker
+                *ngIf="user.latitude && user.longitude"
+                [position]="{ lat: user.latitude, lng: user.longitude }"
+              ></map-marker>
+            </google-map>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Company Information Section -->
+    <div class="col-12">
+      <div class="flex align-items-center mb-3">
+        <h3 class="text-lg font-bold">Company Information</h3>
+        <p-checkbox
+          [(ngModel)]="user.hasCompanyInfo"
+          (onChange)="toggleCompanyInfo($event.checked)"
+          binary
+          inputId="hasCompany"
+          class="ml-3"
+        ></p-checkbox>
+        <label for="hasCompany" class="ml-2">Has Company Information</label>
       </div>
 
       <div
-        *ngIf="user.subscriptionInfo"
-        class="mt-3 p-3 surface-100 border-round"
+        *ngIf="user.hasCompanyInfo && user.company"
+        class="grid p-3 surface-100 border-round"
       >
-        <h4>Subscription Details</h4>
-        <p>Credits: {{ user.subscriptionInfo.credits | number }}/year</p>
-        <p>Maximum Active Bookings: {{ user.subscriptionInfo.maxBookings }}</p>
-        <p>Slots per Booking: {{ user.subscriptionInfo.slots }}</p>
+        <div class="field col-12">
+          <label for="companyName">Company Name</label>
+          <input
+            pInputText
+            id="companyName"
+            [(ngModel)]="user.company.name"
+            maxlength="100"
+          />
+        </div>
+
+        <div class="field col-12 md:col-6">
+          <label>Company Logo</label>
+          <p-fileUpload
+            mode="basic"
+            name="companyLogo"
+            accept="image/*"
+            [maxFileSize]="maxCompanyImageSize"
+            (onSelect)="onCompanyLogoUpload($event)"
+            chooseLabel="Upload Logo"
+          >
+          </p-fileUpload>
+          <small class="p-error"
+            >Max 5MB, JPG/PNG, Recommended: 500x500px</small
+          >
+          <div *ngIf="user.company.logo" class="mt-2">
+            <img
+              [src]="getImageUrl(user.company.logo)"
+              alt="Company Logo"
+              class="w-10rem h-10rem object-cover border-round"
+            />
+          </div>
+        </div>
+
+        <div class="field col-12 md:col-6">
+          <label>Cover Image</label>
+          <p-fileUpload
+            mode="basic"
+            name="coverImage"
+            accept="image/*"
+            [maxFileSize]="maxCompanyImageSize"
+            (onSelect)="onCompanyCoverUpload($event)"
+            chooseLabel="Upload Cover"
+          >
+          </p-fileUpload>
+          <small class="p-error"
+            >Max 5MB, JPG/PNG, Recommended: 1200x400px</small
+          >
+          <div *ngIf="user.company.coverImage" class="mt-2">
+            <img
+              [src]="getImageUrl(user.company.coverImage)"
+              alt="Cover Image"
+              class="w-full h-10rem object-cover border-round"
+            />
+          </div>
+        </div>
+
+        <div class="field col-12">
+          <label for="companyDescription">Company Description</label>
+          <textarea
+            pInputTextarea
+            id="companyDescription"
+            [(ngModel)]="user.company.description"
+            rows="5"
+            maxlength="2000"
+          ></textarea>
+          <small class="p-error">Max 2000 characters</small>
+        </div>
+
+        <div class="field col-12 md:col-6">
+          <label for="industry">Industry</label>
+          <p-dropdown
+            [options]="industryOptions"
+            [(ngModel)]="user.company.industry"
+            placeholder="Select Industry"
+          >
+          </p-dropdown>
+        </div>
+
+        <div class="field col-12 md:col-6">
+          <label for="vatNumber">VAT / UID Number</label>
+          <input
+            pInputText
+            id="vatNumber"
+            [(ngModel)]="user.company.vatNumber"
+            maxlength="50"
+          />
+        </div>
+
+        <div class="field col-12">
+          <label for="logeOffers">The Loge Offers</label>
+          <textarea
+            pInputTextarea
+            id="logeOffers"
+            [(ngModel)]="user.company.logeOffers"
+            rows="3"
+            maxlength="1000"
+          ></textarea>
+          <small class="p-error">Max 1000 characters</small>
+        </div>
+
+        <div class="field col-12">
+          <label for="website">Website Address</label>
+          <input
+            pInputText
+            id="website"
+            [(ngModel)]="user.company.website"
+            maxlength="200"
+          />
+        </div>
+
+        <div class="field col-12">
+          <label>Keywords / Services Tags</label>
+          <div class="p-inputgroup">
+            <input
+              pInputText
+              [(ngModel)]="newTag"
+              placeholder="Add tag (max 30 chars)"
+              maxlength="30"
+              (keyup.enter)="addTag()"
+            />
+            <p-button icon="pi pi-plus" (click)="addTag()"></p-button>
+          </div>
+          <small class="p-error">Max 15 tags, each max 30 characters</small>
+          <div class="flex flex-wrap gap-2 mt-2">
+            <p-tag
+              *ngFor="let tag of user.company.tags; let i = index"
+              [severity]="'info'"
+              [rounded]="true"
+              (onClose)="removeTag(i)"
+            >
+              {{ tag }}
+              <span class="p-tag-icon pi pi-times"></span>
+            </p-tag>
+          </div>
+        </div>
+
+        <!-- Owner Information -->
+        <div class="col-12 mt-3">
+          <h4 class="text-md font-bold mb-2">Owner Information</h4>
+          <div class="grid">
+            <div class="field col-12 md:col-6">
+              <label for="ownerName">Name</label>
+              <input
+                pInputText
+                id="ownerName"
+                [(ngModel)]="user.company.owner.name"
+                maxlength="50"
+              />
+            </div>
+            <div class="field col-12 md:col-6">
+              <label for="ownerPosition">Position/Role</label>
+              <input
+                pInputText
+                id="ownerPosition"
+                [(ngModel)]="user.company.owner.position"
+                maxlength="50"
+              />
+            </div>
+            <div class="field col-12 md:col-6">
+              <label for="ownerEmail">Contact Email Address</label>
+              <input
+                pInputText
+                id="ownerEmail"
+                [(ngModel)]="user.company.owner.email"
+                type="email"
+              />
+            </div>
+            <div class="field col-12 md:col-6">
+              <label for="ownerPhone">Contact Phone Number</label>
+              <input
+                pInputText
+                id="ownerPhone"
+                [(ngModel)]="user.company.owner.phone"
+                maxlength="20"
+              />
+            </div>
+          </div>
+        </div>
       </div>
-    </div>
-
-    <div class="field col-12">
-      <label>Profile Image</label>
-      <p-fileUpload
-        mode="basic"
-        name="profileImage"
-        accept="image/*"
-        [maxFileSize]="maxFileSize"
-        (onSelect)="onUpload($event)"
-        chooseLabel="Upload Image"
-      >
-      </p-fileUpload>
-      <small class="p-error">Max 1MB, JPG/PNG</small>
-    </div>
-
-    <div class="field col-12">
-      <label for="position">Position</label>
-      <input
-        pInputText
-        id="position"
-        [(ngModel)]="user.position"
-        maxlength="50"
-      />
-    </div>
-
-    <div class="field col-12">
-      <label for="phone">Contact Phone Number*</label>
-      <input
-        pInputText
-        id="phone"
-        [(ngModel)]="user.phoneNumber"
-        maxlength="20"
-        required
-      />
-    </div>
-
-    <!-- <div style="width: 300px; height: 300px">
-      <label>Location/Address*</label>
-      <google-map
-        height="400px"
-        width="100%"
-        [center]="center"
-        [zoom]="zoom"
-        (mapClick)="onMapClick($event)"
-      >
-      </google-map>
-      <p *ngIf="locationName"><strong>Location:</strong> {{ locationName }}</p>
-    </div> -->
-
-    <div style="width: 500px; height: 500px; margin-bottom: 40px">
-      <app-gmap />
-    </div>
-
-    <div class="field col-12">
-      <label for="language">Language Preference*</label>
-      <p-dropdown
-        [options]="languageOptions"
-        [(ngModel)]="user.languagePreference"
-        placeholder="Select Language"
-        optionLabel="label"
-        optionValue="value"
-        required
-      >
-      </p-dropdown>
     </div>
   </div>
 

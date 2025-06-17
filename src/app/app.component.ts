@@ -12,10 +12,10 @@ import { InputIconModule } from 'primeng/inputicon';
 import { Table } from 'primeng/table';
 import { DialogModule } from 'primeng/dialog';
 import { OnboardingModalComponent } from './component/onboarding-modal/onboarding-modal.component';
-import { CompanyModalComponent } from './component/company-modal/company-modal.component';
-import { LocationComponent } from './component/location/location.component';
-import { GmapComponent } from "./component/gmap/gmap.component";
 import { SelectButtonModule } from 'primeng/selectbutton';
+import { MessageService } from 'primeng/api';
+import { ToastModule } from 'primeng/toast';
+import { ConfirmDialogModule } from 'primeng/confirmdialog';
 
 interface SubscriptionInfo {
   label: string;
@@ -25,41 +25,44 @@ interface SubscriptionInfo {
   slots: number;
 }
 
+interface CompanyOwner {
+  name: string;
+  position: string;
+  email: string;
+  phone: string;
+}
+
+interface Company {
+  name: string;
+  logo: string | null;
+  coverImage: string | null;
+  description: string;
+  industry: string[];
+  logeOffers: string;
+  tags: string[];
+  website: string;
+  owner: CompanyOwner;
+  vatNumber: string;
+}
+
 interface User {
-  id: number,
+  id: number;
   fullName: string;
   emailAddress: string;
   dateAdded: Date;
-  companyName?: string;
   subscriptionModel: string;
   subscriptionInfo: SubscriptionInfo;
+  profileImage: string | null;
   position: string;
   phoneNumber: string;
-  location: string;
+  address: string;
   languagePreference: string;
+  hasCompanyInfo: boolean;
+  company: Company | null; // This can be either a Company object or null
 }
 
 interface UserType {
   name: string;
-}
-
-interface Company {
-  id: number;
-  name: string;
-  email: string;
-  dateAdded: Date;
-  description?: string;
-  logo: string | null;
-  coverImage: string | null;
-  industry: string;
-  logeOffers: string;
-  tags: string;
-  website: string;
-  ownerName: string;
-  ownerPosition: string;
-  ownerEmail: string;
-  ownerPhone: string;
-  vatNumber: string;
 }
 
 @Component({
@@ -77,147 +80,147 @@ interface Company {
     InputIconModule,
     DialogModule,
     OnboardingModalComponent,
-    CompanyModalComponent,
     HttpClientModule,
     SelectButtonModule,
+    ToastModule,
+    ConfirmDialogModule
   ],
   templateUrl: './app.component.html',
-  styleUrls: ['./app.component.css']
+  styleUrls: ['./app.component.css'],
+  providers: [MessageService]
 })
 export class AppComponent implements OnInit {
   @ViewChild('dt') dt!: Table;
-  @ViewChild('companyTable') companyTable!: Table;
 
   userTypes: UserType[] = [
     { name: 'Admin' },
     { name: 'Ambassador' },
-    { name: 'Company' },
-    { name: 'User' },
+    { name: 'Golf Club' },
+    { name: 'Member' },
   ];
 
   users: User[] = [
     {
-      id: 1,
-      fullName: 'Alice Johnson',
-      emailAddress: 'alice.j@example.com',
-      dateAdded: new Date('2023-01-15T10:00:00Z'),
-      companyName: 'Tech Innovators Inc.',
-      subscriptionModel: 'Economy Class',
-      subscriptionInfo: {
-        label: 'Economy Class',
-        value: 'Economy Class',
-        credits: 4500,
-        maxBookings: 2,
-        slots: 2
-      },
-      position: 'CEO',
-      phoneNumber: '00000',
-      location: '',
-      languagePreference: 'EN'
-    },
-    {
       id: 2,
-      fullName: 'Bob Smith',
-      emailAddress: 'bob.s@example.com',
-      dateAdded: new Date('2023-03-22T14:30:00Z'),
-      companyName: 'Global Solutions Ltd.',
-      subscriptionModel: 'Economy Class',
+      fullName: 'Bob Williams',
+      emailAddress: 'bob.w@example.com',
+      dateAdded: new Date('2023-03-20T11:30:00Z'),
+      subscriptionModel: 'Business Plus',
       subscriptionInfo: {
-        label: 'Economy Class',
-        value: 'Economy Class',
-        credits: 4500,
-        maxBookings: 2,
-        slots: 2
+        label: 'Business Plus',
+        value: 'BusinessPlus',
+        credits: 10000,
+        maxBookings: 5,
+        slots: 5
       },
-      position: 'CEO',
-      phoneNumber: '00000',
-      location: '',
-      languagePreference: 'EN'
-    },
-    {
+      profileImage: 'https://example.com/profiles/bob.jpg',
+      position: 'Marketing Director',
+      phoneNumber: '0987654321',
+      address: '456 Oak Ave, Los Angeles, CA',
+      languagePreference: 'EN',
+      hasCompanyInfo: true,
+      company: {
+        name: 'Global Marketing Solutions',
+        logo: null,
+        coverImage: 'https://example.com/companies/gms_cover.jpg',
+        description: 'Specializing in digital marketing strategies.',
+        industry: ['Marketing & Advertising', 'Business & Coaching'],
+        logeOffers: 'Comprehensive marketing audits',
+        tags: ['digital marketing', 'SEO', 'branding'],
+        website: 'https://globalmarketing.com',
+        owner: {
+          name: 'Bob Williams',
+          position: 'Co-Founder',
+          email: 'bob@globalmarketing.com',
+          phone: '0987654321'
+        },
+        vatNumber: 'US987654321'
+      }
+    }, {
       id: 3,
-      fullName: 'Charlie Brown',
-      emailAddress: 'charlie.b@example.com',
-      dateAdded: new Date('2023-05-01T09:15:00Z'),
-      subscriptionModel: 'Economy Class',
+      fullName: 'Charlie Green',
+      emailAddress: 'charlie.g@example.com',
+      dateAdded: new Date('2023-05-01T09:00:00Z'),
+      subscriptionModel: 'Premium Annual',
       subscriptionInfo: {
-        label: 'Economy Class',
-        value: 'Economy Class',
-        credits: 4500,
-        maxBookings: 2,
-        slots: 2
+        label: 'Premium Annual',
+        value: 'PremiumAnnual',
+        credits: 20000,
+        maxBookings: 10,
+        slots: 10
       },
-      position: 'CEO',
-      phoneNumber: '00000',
-      location: '',
-      languagePreference: 'EN'
-    },
-    {
+      profileImage: null,
+      position: 'HR Manager',
+      phoneNumber: '1122334455',
+      address: '789 Pine Ln, Chicago, IL',
+      languagePreference: 'ES',
+      hasCompanyInfo: true,
+      company: {
+        name: 'Dynamic Staffing Co.',
+        logo: 'https://example.com/companies/dynamic_logo.png',
+        coverImage: null,
+        description: 'Your partner in talent acquisition and HR solutions.',
+        industry: ['Human Resources', 'Business & Coaching'],
+        logeOffers: 'Executive search services, HR consulting',
+        tags: ['recruitment', 'HR', 'staffing'],
+        website: 'https://dynamicstaffing.com',
+        owner: {
+          name: 'Charlie Green',
+          position: 'CEO',
+          email: 'charlie@dynamicstaffing.com',
+          phone: '1122334455'
+        },
+        vatNumber: 'US456789012'
+      }
+    }, {
       id: 4,
       fullName: 'Diana Prince',
       emailAddress: 'diana.p@example.com',
-      dateAdded: new Date('2023-07-10T11:45:00Z'),
-      companyName: 'Wonder Corp.',
+      dateAdded: new Date('2024-02-10T14:00:00Z'),
+      subscriptionModel: 'Free Tier',
+      subscriptionInfo: {
+        label: 'Free Tier',
+        value: 'FreeTier',
+        credits: 500,
+        maxBookings: 1,
+        slots: 1
+      },
+      profileImage: 'https://example.com/profiles/diana.png',
+      position: 'Freelance Designer',
+      phoneNumber: '5551234567',
+      address: '101 Art St, Seattle, WA',
+      languagePreference: 'EN',
+      hasCompanyInfo: false, // No company info for this user
+      company: null // Company object is null
+    }, {
+      id: 5,
+      fullName: 'Eve Adams',
+      emailAddress: 'eve.a@example.com',
+      dateAdded: new Date('2024-04-05T08:00:00Z'),
       subscriptionModel: 'Economy Class',
       subscriptionInfo: {
         label: 'Economy Class',
-        value: 'Economy Class',
+        value: 'EconomyClass',
         credits: 4500,
         maxBookings: 2,
         slots: 2
       },
-      position: 'CEO',
-      phoneNumber: '00000',
-      location: '',
-      languagePreference: 'EN'
-    }
-  ];
-
-  companies: Company[] = [
-    {
-      id: 1,
-      name: 'Tech Innovators Inc.',
-      email: 'info@techinnovators.com',
-      dateAdded: new Date('2023-01-10T09:00:00Z'),
-      description: 'Innovative technology solutions provider',
-      logo: null,
-      coverImage: null,
-      industry: '',
-      logeOffers: '',
-      tags: '',
-      website: '',
-      ownerName: '',
-      ownerPosition: '',
-      ownerEmail: '',
-      ownerPhone: '',
-      vatNumber: ''
-    },
-    {
-      id: 1,
-      name: 'Global Solutions Ltd.',
-      email: 'contact@globalsolutions.com',
-      dateAdded: new Date('2023-03-15T11:30:00Z'),
-      description: 'Worldwide business consulting',
-      logo: null,
-      coverImage: null,
-      industry: '',
-      logeOffers: '',
-      tags: '',
-      website: '',
-      ownerName: '',
-      ownerPosition: '',
-      ownerEmail: '',
-      ownerPhone: '',
-      vatNumber: ''
+      profileImage: null,
+      position: 'Student',
+      phoneNumber: '0123456789',
+      address: '202 University Ave, Boston, MA',
+      languagePreference: 'FR',
+      hasCompanyInfo: false, // No company info for this user
+      company: null // Company object is null
     }
   ];
 
   selectedUserType: UserType | undefined;
   loading = false;
   modalVisible = false;
-  companyModalVisible = false;
   selectedUser: User | null = null;
-  selectedCompany: Company | null = null;
+
+  constructor(private messageService: MessageService) { }
 
   ngOnInit() {
     this.sortData();
@@ -225,17 +228,11 @@ export class AppComponent implements OnInit {
 
   private sortData(): void {
     this.users = [...this.users].sort((a, b) => b.dateAdded.getTime() - a.dateAdded.getTime());
-    this.companies = [...this.companies].sort((a, b) => b.dateAdded.getTime() - a.dateAdded.getTime());
   }
 
   applyFilter(event: Event): void {
     const filterValue = (event.target as HTMLInputElement).value;
     this.dt.filterGlobal(filterValue, 'contains');
-  }
-
-  applyCompanyFilter(event: Event): void {
-    const filterValue = (event.target as HTMLInputElement).value;
-    this.companyTable.filterGlobal(filterValue, 'contains');
   }
 
   clear(): void {
@@ -246,26 +243,13 @@ export class AppComponent implements OnInit {
     this.selectedUserType = undefined;
   }
 
-  clearCompanyFilter(): void {
-    this.companyTable.clear();
-    this.companyTable.sortField = 'dateAdded';
-    this.companyTable.sortOrder = -1;
-    this.companyTable.sortSingle();
-  }
-
   showUserDetails(user: User): void {
-    this.selectedUser = { ...user };
+    this.selectedUser = JSON.parse(JSON.stringify(user));
     this.modalVisible = true;
   }
 
-  showCompanyDetails(company: Company): void {
-    this.selectedCompany = { ...company };
-    this.companyModalVisible = true;
-  }
-
   onUserSaved(updatedUser: User): void {
-    const index = this.users.findIndex(u => u.emailAddress === updatedUser.emailAddress);
-    console.log(updatedUser);
+    const index = this.users.findIndex(u => u.id === updatedUser.id);
     if (index !== -1) {
       this.users = [
         ...this.users.slice(0, index),
@@ -273,50 +257,18 @@ export class AppComponent implements OnInit {
         ...this.users.slice(index + 1)
       ];
       this.sortData();
-      if (this.dt) {
-        this.dt.reset();
-        setTimeout(() => this.dt.value = [...this.users]);
-      }
+      this.messageService.add({
+        severity: 'success',
+        summary: 'Success',
+        detail: 'User updated successfully'
+      });
     }
     this.modalVisible = false;
-  }
-
-  onCompanySaved(updatedCompany: Company): void {
-    const index = this.companies.findIndex(c => c.email === updatedCompany.email);
-    if (index !== -1) {
-      this.companies = [
-        ...this.companies.slice(0, index),
-        { ...updatedCompany },
-        ...this.companies.slice(index + 1)
-      ];
-      this.sortData();
-      if (this.companyTable) {
-        this.companyTable.reset();
-        setTimeout(() => this.companyTable.value = [...this.companies]);
-      }
-    }
-    this.companyModalVisible = false;
-  }
-
-  shouldShowUsersTable(): boolean {
-    return (
-      !this.selectedUserType ||
-      this.selectedUserType.name === 'User' ||
-      this.selectedUserType.name === 'Admin' ||
-      this.selectedUserType.name === 'Ambassador'
-    );
-  }
-
-  shouldShowCompaniesTable(): boolean {
-    return this.selectedUserType?.name === 'Company';
   }
 
   getUsers(): User[] {
     return this.users;
   }
 
-  getCompanies(): Company[] {
-    return this.companies;
-  }
 
 }
