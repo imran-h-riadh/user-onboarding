@@ -1,0 +1,144 @@
+<p-dialog
+  [visible]="visible"
+  (visibleChange)="visibleChange.emit($event)"
+  [style]="{ width: '80vw' }"
+  header="User Details"
+  [draggable]="true"
+  [resizable]="true"
+>
+  <div *ngIf="user" class="p-fluid grid p-4">
+    <div class="field col-12 md:col-6">
+      <label for="firstName">First Name*</label>
+      <input
+        pInputText
+        id="firstName"
+        [(ngModel)]="user.firstName"
+        maxlength="50"
+        required
+      />
+    </div>
+    <div class="field col-12 md:col-6">
+      <label for="lastName">Last Name*</label>
+      <input
+        pInputText
+        id="lastName"
+        [(ngModel)]="user.lastName"
+        maxlength="50"
+        required
+      />
+    </div>
+
+    <div class="field col-12">
+      <label for="email">Email Address</label>
+      <input pInputText id="email" [ngModel]="user.email" readonly />
+    </div>
+
+    <div class="field col-12">
+      <label>Subscription Model*</label>
+      <div class="flex flex-column gap-3">
+        <div
+          *ngFor="let option of subscriptionOptions"
+          class="flex align-items-center"
+        >
+          <p-radioButton
+            [inputId]="option.value"
+            name="subscription"
+            [value]="option.value"
+            [(ngModel)]="user.subscriptionModel"
+            (onClick)="user.subscriptionInfo = option"
+          >
+          </p-radioButton>
+          <label [for]="option.value" class="ml-2">
+            {{ option.label }} ({{ option.credits | number }} Credits/year)
+          </label>
+        </div>
+      </div>
+
+      <div
+        *ngIf="user.subscriptionInfo"
+        class="mt-3 p-3 surface-100 border-round"
+      >
+        <h4>Subscription Details</h4>
+        <p>Credits: {{ user.subscriptionInfo.credits | number }}/year</p>
+        <p>Maximum Active Bookings: {{ user.subscriptionInfo.maxBookings }}</p>
+        <p>Slots per Booking: {{ user.subscriptionInfo.slots }}</p>
+      </div>
+    </div>
+
+    <div class="field col-12">
+      <label>Profile Image</label>
+      <p-fileUpload
+        mode="basic"
+        name="profileImage"
+        accept="image/*"
+        [maxFileSize]="maxFileSize"
+        (onSelect)="onUpload($event)"
+        chooseLabel="Upload Image"
+      >
+      </p-fileUpload>
+      <small class="p-error">Max 1MB, JPG/PNG</small>
+    </div>
+
+    <div class="field col-12">
+      <label for="position">Position</label>
+      <input
+        pInputText
+        id="position"
+        [(ngModel)]="user.position"
+        maxlength="50"
+      />
+    </div>
+
+    <div class="field col-12">
+      <label for="phone">Contact Phone Number*</label>
+      <input
+        pInputText
+        id="phone"
+        [(ngModel)]="user.phoneNumber"
+        maxlength="20"
+        required
+      />
+    </div>
+
+    <div class="field col-12">
+      <label>Location/Address*</label>
+      <google-map
+        height="400px"
+        width="100%"
+        [center]="center"
+        [zoom]="zoom"
+        (mapClick)="onMapClick($event)"
+      >
+      </google-map>
+      <p *ngIf="locationName"><strong>Location:</strong> {{ locationName }}</p>
+    </div>
+
+    <div class="field col-12">
+      <label for="language">Language Preference*</label>
+      <p-dropdown
+        [options]="languageOptions"
+        [(ngModel)]="user.languagePreference"
+        placeholder="Select Language"
+        optionLabel="label"
+        optionValue="value"
+        required
+      >
+      </p-dropdown>
+    </div>
+  </div>
+
+  <ng-template pTemplate="footer">
+    <p-button
+      label="Cancel"
+      icon="pi pi-times"
+      (click)="onHide()"
+      styleClass="p-button-text"
+    />
+    <p-button
+      label="Save"
+      icon="pi pi-check"
+      (click)="onSave()"
+      styleClass="p-button-success"
+    />
+  </ng-template>
+</p-dialog>

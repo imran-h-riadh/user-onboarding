@@ -1,0 +1,7 @@
+@import "tailwindcss/base";
+@import "tailwindcss/components";
+@import "tailwindcss/utilities";
+
+:host ::ng-deep .custom-button .p-button {
+  @apply bg-red-500 text-white hover:bg-blue-600 hover:text-white rounded-lg px-6 py-2 transition duration-300;
+}

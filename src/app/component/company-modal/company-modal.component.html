@@ -1,0 +1,172 @@
+<p-dialog
+  [visible]="visible"
+  (visibleChange)="visibleChange.emit($event)"
+  [style]="{ width: '80vw', 'max-width': '1200px' }"
+  header="Company Details"
+  [draggable]="true"
+  [resizable]="true"
+>
+  <div *ngIf="company" class="p-fluid grid p-4">
+    <div class="field col-12">
+      <label for="companyName">Company Name*</label>
+      <input
+        pInputText
+        id="companyName"
+        [(ngModel)]="company.name"
+        maxlength="100"
+        required
+      />
+    </div>
+
+    <div class="field col-12">
+      <label for="email">Email Address</label>
+      <input pInputText id="email" [(ngModel)]="company.email" />
+    </div>
+
+    <div class="field col-12 md:col-6">
+      <label>Company Logo*</label>
+      <p-fileUpload
+        mode="basic"
+        name="logo"
+        accept="image/*"
+        [maxFileSize]="maxFileSize"
+        (onSelect)="onLogoUpload($event)"
+        chooseLabel="Upload Logo"
+      ></p-fileUpload>
+      <small class="p-error">Max 5MB, JPG/PNG, Recommended: 500x500px</small>
+    </div>
+
+    <div class="field col-12 md:col-6">
+      <label>Cover Image</label>
+      <p-fileUpload
+        mode="basic"
+        name="coverImage"
+        accept="image/*"
+        [maxFileSize]="maxFileSize"
+        (onSelect)="onCoverUpload($event)"
+        chooseLabel="Upload Cover Image"
+      ></p-fileUpload>
+      <small class="p-error">Max 5MB, JPG/PNG, Recommended: 1200x400px</small>
+    </div>
+
+    <div class="field col-12">
+      <label for="description">Company Description</label>
+      <textarea
+        pInputTextarea
+        id="description"
+        [(ngModel)]="company.description"
+        [rows]="5"
+        maxlength="2000"
+      ></textarea>
+    </div>
+
+    <div class="field col-12">
+      <label for="industry">Industry*</label>
+      <p-dropdown
+        [options]="industries"
+        [(ngModel)]="company.industry"
+        placeholder="Select Industry"
+        optionLabel="label"
+        optionValue="value"
+        required
+      ></p-dropdown>
+    </div>
+
+    <div class="field col-12">
+      <label for="logeOffers">The Loge Offers</label>
+      <textarea
+        pInputTextarea
+        id="logeOffers"
+        [(ngModel)]="company.logeOffers"
+        [rows]="3"
+        maxlength="1000"
+      ></textarea>
+    </div>
+
+    <div class="field col-12">
+      <label for="tags">Keywords / Services Tags</label>
+      <input
+        pInputText
+        id="tags"
+        [(ngModel)]="company.tags"
+        placeholder="Enter tags separated by commas"
+        (onBlur)="addTag($event)"
+      />
+      <small>Up to 15 tags, each max 30 characters</small>
+    </div>
+
+    <div class="field col-12">
+      <label for="website">Website Address</label>
+      <input
+        pInputText
+        id="website"
+        [(ngModel)]="company.website"
+        maxlength="200"
+      />
+    </div>
+
+    <div class="col-12">
+      <h3>Owner Information</h3>
+    </div>
+
+    <div class="field col-12 md:col-6">
+      <label for="ownerName">Owner Name</label>
+      <input
+        pInputText
+        id="ownerName"
+        [(ngModel)]="company.ownerName"
+        maxlength="50"
+      />
+    </div>
+
+    <div class="field col-12 md:col-6">
+      <label for="ownerPosition">Position/Role</label>
+      <input
+        pInputText
+        id="ownerPosition"
+        [(ngModel)]="company.ownerPosition"
+        maxlength="50"
+      />
+    </div>
+
+    <div class="field col-12 md:col-6">
+      <label for="ownerEmail">Contact Email Address</label>
+      <input pInputText id="ownerEmail" [(ngModel)]="company.ownerEmail" />
+    </div>
+
+    <div class="field col-12 md:col-6">
+      <label for="ownerPhone">Contact Phone Number</label>
+      <input
+        pInputText
+        id="ownerPhone"
+        [(ngModel)]="company.ownerPhone"
+        maxlength="20"
+      />
+    </div>
+
+    <div class="field col-12">
+      <label for="vatNumber">VAT / UID Number</label>
+      <input
+        pInputText
+        id="vatNumber"
+        [(ngModel)]="company.vatNumber"
+        maxlength="50"
+      />
+    </div>
+  </div>
+
+  <ng-template pTemplate="footer">
+    <p-button
+      label="Cancel"
+      icon="pi pi-times"
+      (click)="onHide()"
+      styleClass="p-button-text"
+    />
+    <p-button
+      label="Save"
+      icon="pi pi-check"
+      (click)="onSave()"
+      styleClass="p-button-success"
+    />
+  </ng-template>
+</p-dialog>

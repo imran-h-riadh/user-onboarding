@@ -1,0 +1,17 @@
+@import "tailwindcss";
+
+:host ::ng-deep .custom-button {
+  @apply bg-blue-500 hover:bg-blue-700 text-white font-medium px-4 py-2 rounded;
+}
+
+:host ::ng-deep .custom-button:hover {
+  @apply bg-amber-500 text-green-900;
+}
+
+:host ::ng-deep .custom-button-full {
+  @apply w-full bg-purple-500 text-white hover:bg-purple-700;
+}
+
+:host ::ng-deep .custom-button-sm {
+  @apply bg-gray-700 hover:bg-gray-600 text-white p-2 rounded-full;
+}
