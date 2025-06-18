@@ -1,3 +1,5 @@
+<p-toast></p-toast>
+<p-confirmDialog [style]="{ width: '50vw' }"></p-confirmDialog>
 <p-dialog
   [visible]="visible"
   (visibleChange)="visibleChange.emit($event)"
@@ -19,17 +21,7 @@
           <input
             pInputText
             id="firstName"
-            [(ngModel)]="user.firstName"
-            maxlength="50"
-            required
-          />
-        </div>
-        <div class="field col-12 md:col-6">
-          <label for="lastName">Last Name*</label>
-          <input
-            pInputText
-            id="lastName"
-            [(ngModel)]="user.lastName"
+            [(ngModel)]="user.fullName"
             maxlength="50"
             required
           />
@@ -142,7 +134,7 @@
           <label for="address">Location / Address*</label>
           <input pInputText id="address" [(ngModel)]="user.address" required />
           <div class="mt-2 border-round overflow-hidden" style="height: 300px">
-            <google-map
+            <!-- <google-map
               [center]="center"
               [zoom]="zoom"
               (mapClick)="onMapClick($event)"
@@ -151,7 +143,7 @@
                 *ngIf="user.latitude && user.longitude"
                 [position]="{ lat: user.latitude, lng: user.longitude }"
               ></map-marker>
-            </google-map>
+            </google-map> -->
           </div>
         </div>
       </div>

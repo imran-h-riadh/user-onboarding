@@ -123,6 +123,9 @@ export class OnboardingModalComponent {
         // User cancelled - do nothing
       }
     });
+    // console.log(this.user);
+    // this.saveConfirmed.emit({ ...this.user });
+    // this.visibleChange.emit(false);
   }
 
   getImageUrl(image: any): string {
