@@ -131,19 +131,10 @@
         </div>
 
         <div class="field col-12">
-          <label for="address">Location / Address*</label>
-          <input pInputText id="address" [(ngModel)]="user.address" required />
+          <!-- <input pInputText id="address" [(ngModel)]="user.address" required /> -->
+          <!-- here i need like this input field will updated which is in location component -->
           <div class="mt-2 border-round overflow-hidden" style="height: 300px">
-            <!-- <google-map
-              [center]="center"
-              [zoom]="zoom"
-              (mapClick)="onMapClick($event)"
-            >
-              <map-marker
-                *ngIf="user.latitude && user.longitude"
-                [position]="{ lat: user.latitude, lng: user.longitude }"
-              ></map-marker>
-            </google-map> -->
+            <app-gmap [address]="user.address"></app-gmap>
           </div>
         </div>
       </div>

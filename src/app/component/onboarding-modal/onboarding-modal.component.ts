@@ -15,6 +15,7 @@ import { CheckboxModule } from 'primeng/checkbox';
 import { MessageService, ConfirmationService } from 'primeng/api';
 import { ToastModule } from 'primeng/toast';
 import { ConfirmDialogModule } from 'primeng/confirmdialog';
+import { GmapComponent } from "../gmap/gmap.component";
 
 @Component({
   selector: 'app-onboarding-modal',
@@ -34,7 +35,8 @@ import { ConfirmDialogModule } from 'primeng/confirmdialog';
     InputTextModule,
     CheckboxModule,
     ToastModule,
-    ConfirmDialogModule
+    ConfirmDialogModule,
+    GmapComponent
   ],
   templateUrl: './onboarding-modal.component.html',
   styleUrls: ['./onboarding-modal.component.css'],
