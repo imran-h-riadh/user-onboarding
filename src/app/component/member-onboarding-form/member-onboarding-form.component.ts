@@ -18,6 +18,7 @@ import { ConfirmDialogModule } from 'primeng/confirmdialog';
 import { MessageService, ConfirmationService } from 'primeng/api';
 import { ToastModule } from 'primeng/toast';
 import { MemberTermsModalComponent } from "../member-terms-modal/member-terms-modal.component";
+import { GmapComponent } from "../gmap/gmap.component";
 
 @Component({
   selector: 'app-member-onboarding-form',
@@ -34,7 +35,8 @@ import { MemberTermsModalComponent } from "../member-terms-modal/member-terms-mo
     FileUploadModule,
     ConfirmDialogModule,
     ToastModule,
-    MemberTermsModalComponent
+    MemberTermsModalComponent,
+    GmapComponent
   ],
   providers: [ConfirmationService],
 })
