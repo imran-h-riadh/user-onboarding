@@ -1,0 +1,402 @@
+<p-toast></p-toast>
+<p-confirmDialog [style]="{ width: '50vw' }"></p-confirmDialog>
+<p-dialog
+  [(visible)]="visible"
+  (visibleChange)="visibleChange.emit($event)"
+  [style]="{ width: '90vw', maxWidth: '1200px' }"
+  header="User Details"
+  [draggable]="true"
+  [resizable]="true"
+  [modal]="true"
+  [breakpoints]="{ '960px': '75vw', '640px': '90vw' }"
+  [styleClass]="'member-onboarding-dialog'"
+>
+  <form *ngIf="form" [formGroup]="form" class="p-fluid grid">
+    <!-- User Information Section -->
+    <div class="col-12 md:col-6">
+      <h3>User Information</h3>
+
+      <div class="field">
+        <label for="fullName">Full Name*</label>
+        <input
+          id="fullName"
+          type="text"
+          pInputText
+          formControlName="fullName"
+        />
+        <small
+          class="p-error"
+          *ngIf="form.get('fullName')?.touched && form.get('fullName')?.invalid"
+        >
+          <span *ngIf="form.get('fullName')?.errors?.['required']"
+            >Full name is required</span
+          >
+          <span *ngIf="form.get('fullName')?.errors?.['maxlength']"
+            >Max 100 characters</span
+          >
+        </small>
+      </div>
+
+      <div class="field">
+        <label for="emailAddress">Email Address</label>
+        <input
+          id="emailAddress"
+          type="email"
+          pInputText
+          formControlName="emailAddress"
+        />
+      </div>
+
+      <div class="field">
+        <label for="subscriptionModel">Subscription Model*</label>
+        <p-dropdown
+          id="subscriptionModel"
+          [options]="subscriptionOptions"
+          formControlName="subscriptionModel"
+          placeholder="Select Subscription"
+        >
+        </p-dropdown>
+        <small
+          class="p-error"
+          *ngIf="
+            form.get('subscriptionModel')?.touched &&
+            form.get('subscriptionModel')?.invalid
+          "
+        >
+          Subscription model is required
+        </small>
+        <div
+          *ngIf="form.get('subscriptionModel')?.value"
+          class="subscription-info"
+        >
+          <p>
+            <strong>Credits:</strong>
+            {{ updateSubscriptionInfo().credits }}/year
+          </p>
+          <p>
+            <strong>Max Bookings:</strong>
+            {{ updateSubscriptionInfo().maxBookings }}
+          </p>
+          <p>
+            <strong>Slots per Booking:</strong>
+            {{ updateSubscriptionInfo().slots }}
+          </p>
+        </div>
+      </div>
+
+      <div class="field">
+        <label for="profileImage">Profile Image</label>
+        <p-fileUpload
+          id="profileImage"
+          mode="basic"
+          chooseLabel="Upload"
+          accept="image/*"
+          maxFileSize="1000000"
+          (onSelect)="onProfileImageUpload($event)"
+          [showUploadButton]="false"
+          [showCancelButton]="false"
+        >
+        </p-fileUpload>
+        <small>Max 1MB (JPG/PNG)</small>
+      </div>
+
+      <div class="field">
+        <label for="position">Position</label>
+        <input
+          id="position"
+          type="text"
+          pInputText
+          formControlName="position"
+        />
+        <small
+          class="p-error"
+          *ngIf="form.get('position')?.touched && form.get('position')?.errors?.['maxlength']"
+        >
+          Max 50 characters
+        </small>
+      </div>
+
+      <div class="field">
+        <label for="phoneNumber">Phone Number*</label>
+        <input
+          id="phoneNumber"
+          type="text"
+          pInputText
+          formControlName="phoneNumber"
+        />
+        <small
+          class="p-error"
+          *ngIf="
+            form.get('phoneNumber')?.touched && form.get('phoneNumber')?.invalid
+          "
+        >
+          <span *ngIf="form.get('phoneNumber')?.errors?.['required']"
+            >Phone number is required</span
+          >
+          <span *ngIf="form.get('phoneNumber')?.errors?.['maxlength']"
+            >Max 20 characters</span
+          >
+        </small>
+      </div>
+
+      <div class="field">
+        <label for="address">Address*</label>
+        <input id="address" type="text" pInputText formControlName="address" />
+        <small
+          class="p-error"
+          *ngIf="form.get('address')?.touched && form.get('address')?.invalid"
+        >
+          Address is required
+        </small>
+      </div>
+
+      <div class="field">
+        <label for="languagePreference">Language Preference*</label>
+        <p-dropdown
+          id="languagePreference"
+          [options]="languageOptions"
+          formControlName="languagePreference"
+          placeholder="Select Language"
+        >
+        </p-dropdown>
+      </div>
+    </div>
+
+    <!-- Company Information Section -->
+    <div
+      class="col-12 md:col-6"
+      *ngIf="user?.hasCompanyInfo"
+      formGroupName="company"
+    >
+      <h3>Company Information</h3>
+
+      <div class="field">
+        <label for="companyName">Company Name</label>
+        <input id="companyName" type="text" pInputText formControlName="name" />
+        <small
+          class="p-error"
+          *ngIf="company.get('name')?.touched && company.get('name')?.errors?.['maxlength']"
+        >
+          Max 100 characters
+        </small>
+      </div>
+
+      <div class="field">
+        <label for="companyLogo">Company Logo</label>
+        <p-fileUpload
+          id="companyLogo"
+          mode="basic"
+          chooseLabel="Upload Logo"
+          accept="image/*"
+          maxFileSize="5000000"
+          (onSelect)="onCompanyImageUpload($event, 'logo')"
+          [showUploadButton]="false"
+          [showCancelButton]="false"
+        >
+        </p-fileUpload>
+        <small>Max 5MB (JPG/PNG), Recommended: 500x500px</small>
+      </div>
+
+      <div class="field">
+        <label for="companyCoverImage">Company Cover Image</label>
+        <p-fileUpload
+          id="companyCoverImage"
+          mode="basic"
+          chooseLabel="Upload Cover"
+          accept="image/*"
+          maxFileSize="5000000"
+          (onSelect)="onCompanyImageUpload($event, 'coverImage')"
+          [showUploadButton]="false"
+          [showCancelButton]="false"
+        >
+        </p-fileUpload>
+        <small>Max 5MB (JPG/PNG), Recommended: 1200x400px</small>
+      </div>
+
+      <div class="field">
+        <label for="companyDescription">Company Description</label>
+        <textarea
+          id="companyDescription"
+          pInputTextarea
+          formControlName="description"
+          rows="4"
+        ></textarea>
+        <small
+          class="p-error"
+          *ngIf="company.get('description')?.touched && company.get('description')?.errors?.['maxlength']"
+        >
+          Max 2000 characters
+        </small>
+      </div>
+
+      <div class="field">
+        <label for="industry">Industry</label>
+        <p-dropdown
+          id="industry"
+          [options]="industryOptions"
+          formControlName="industry"
+          placeholder="Select Industry"
+        >
+        </p-dropdown>
+      </div>
+
+      <div class="field">
+        <label for="logeOffers">The Loge Offers</label>
+        <textarea
+          id="logeOffers"
+          pInputTextarea
+          formControlName="logeOffers"
+          rows="3"
+        ></textarea>
+        <small
+          class="p-error"
+          *ngIf="company.get('logeOffers')?.touched && company.get('logeOffers')?.errors?.['maxlength']"
+        >
+          Max 1000 characters
+        </small>
+      </div>
+
+      <div class="field">
+        <label for="tags">Keywords / Services Tags</label>
+        <textarea
+          id="tags"
+          pInputTextarea
+          formControlName="tags"
+          rows="2"
+          placeholder="Comma-separated tags (max 15 tags, 30 chars each)"
+        ></textarea>
+        <small>Up to 15 tags, each max 30 characters. Comma-separated.</small>
+      </div>
+
+      <div class="field">
+        <label for="website">Website Address</label>
+        <input
+          id="website"
+          type="url"
+          pInputText
+          formControlName="website"
+          placeholder="https://example.com"
+        />
+        <small
+          class="p-error"
+          *ngIf="
+            company.get('website')?.touched && company.get('website')?.invalid
+          "
+        >
+          <span *ngIf="company.get('website')?.errors?.['pattern']"
+            >Please enter a valid URL</span
+          >
+          <span *ngIf="company.get('website')?.errors?.['maxlength']"
+            >Max 200 characters</span
+          >
+        </small>
+      </div>
+
+      <!-- Owner Information -->
+      <div formGroupName="owner">
+        <h4>Owner Information</h4>
+
+        <div class="field">
+          <label for="ownerName">Owner Name</label>
+          <input id="ownerName" type="text" pInputText formControlName="name" />
+          <small
+            class="p-error"
+            *ngIf="company.get('owner.name')?.touched && company.get('owner.name')?.errors?.['maxlength']"
+          >
+            Max 50 characters
+          </small>
+        </div>
+
+        <div class="field">
+          <label for="ownerPosition">Position/Role</label>
+          <input
+            id="ownerPosition"
+            type="text"
+            pInputText
+            formControlName="position"
+          />
+          <small
+            class="p-error"
+            *ngIf="company.get('owner.position')?.touched && company.get('owner.position')?.errors?.['maxlength']"
+          >
+            Max 50 characters
+          </small>
+        </div>
+
+        <div class="field">
+          <label for="ownerEmail">Contact Email Address</label>
+          <input
+            id="ownerEmail"
+            type="email"
+            pInputText
+            formControlName="email"
+          />
+          <small
+            class="p-error"
+            *ngIf="company.get('owner.email')?.touched && company.get('owner.email')?.errors?.['email']"
+          >
+            Please enter a valid email address
+          </small>
+        </div>
+
+        <div class="field">
+          <label for="ownerPhone">Contact Phone Number</label>
+          <input
+            id="ownerPhone"
+            type="text"
+            pInputText
+            formControlName="phone"
+          />
+          <small
+            class="p-error"
+            *ngIf="company.get('owner.phone')?.touched && company.get('owner.phone')?.errors?.['maxlength']"
+          >
+            Max 20 characters
+          </small>
+        </div>
+      </div>
+
+      <div class="field">
+        <label for="vatNumber">VAT / UID Number</label>
+        <input
+          id="vatNumber"
+          type="text"
+          pInputText
+          formControlName="vatNumber"
+          placeholder="Alphanumeric"
+        />
+        <small
+          class="p-error"
+          *ngIf="company.get('vatNumber')?.touched && company.get('vatNumber')?.errors?.['maxlength']"
+        >
+          Max 50 characters
+        </small>
+      </div>
+    </div>
+    <p-button
+      (click)="showTermsAndConditionDialog()"
+      label="Show Terms And Condition"
+    />
+  </form>
+
+  <ng-template pTemplate="footer">
+    <p-button
+      label="Cancel"
+      icon="pi pi-times"
+      (click)="onHide()"
+      styleClass="p-button-text"
+    />
+    <p-button
+      label="Save"
+      icon="pi pi-check"
+      (click)="onSave()"
+      styleClass="p-button-success"
+      [disabled]="form?.invalid"
+    />
+  </ng-template>
+
+  <app-member-terms-modal
+    [(visible)]="showTermsModal"
+    (save)="handleTermsSave($event)"
+  />
+</p-dialog>

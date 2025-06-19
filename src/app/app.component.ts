@@ -16,6 +16,7 @@ import { SelectButtonModule } from 'primeng/selectbutton';
 import { MessageService } from 'primeng/api';
 import { ToastModule } from 'primeng/toast';
 import { ConfirmDialogModule } from 'primeng/confirmdialog';
+import { MemberOnboardingFormComponent } from "./component/member-onboarding-form/member-onboarding-form.component";
 
 interface SubscriptionInfo {
   label: string;
@@ -37,7 +38,7 @@ interface Company {
   logo: string | null;
   coverImage: string | null;
   description: string;
-  industry: string[];
+  industry: string;
   logeOffers: string;
   tags: string[];
   website: string;
@@ -57,6 +58,7 @@ interface User {
   phoneNumber: string;
   address: string;
   languagePreference: string;
+  condition: File | null;
   hasCompanyInfo: boolean;
   company: Company | null; // This can be either a Company object or null
 }
@@ -83,7 +85,8 @@ interface UserType {
     HttpClientModule,
     SelectButtonModule,
     ToastModule,
-    ConfirmDialogModule
+    ConfirmDialogModule,
+    MemberOnboardingFormComponent
   ],
   templateUrl: './app.component.html',
   styleUrls: ['./app.component.css'],
@@ -118,13 +121,15 @@ export class AppComponent implements OnInit {
       phoneNumber: '0987654321',
       address: '456 Oak Ave, Los Angeles, CA',
       languagePreference: 'EN',
+      condition: null,
+
       hasCompanyInfo: true,
       company: {
         name: 'Global Marketing Solutions',
         logo: null,
         coverImage: 'https://example.com/companies/gms_cover.jpg',
         description: 'Specializing in digital marketing strategies.',
-        industry: ['Marketing & Advertising', 'Business & Coaching'],
+        industry: 'Travel & Vacation',
         logeOffers: 'Comprehensive marketing audits',
         tags: ['digital marketing', 'SEO', 'branding'],
         website: 'https://globalmarketing.com',
@@ -154,13 +159,14 @@ export class AppComponent implements OnInit {
       phoneNumber: '1122334455',
       address: '789 Pine Ln, Chicago, IL',
       languagePreference: 'ES',
+      condition: null,
       hasCompanyInfo: true,
       company: {
         name: 'Dynamic Staffing Co.',
         logo: 'https://example.com/companies/dynamic_logo.png',
         coverImage: null,
         description: 'Your partner in talent acquisition and HR solutions.',
-        industry: ['Human Resources', 'Business & Coaching'],
+        industry: 'Travel & Vacation',
         logeOffers: 'Executive search services, HR consulting',
         tags: ['recruitment', 'HR', 'staffing'],
         website: 'https://dynamicstaffing.com',
@@ -190,6 +196,8 @@ export class AppComponent implements OnInit {
       phoneNumber: '5551234567',
       address: '101 Art St, Seattle, WA',
       languagePreference: 'EN',
+      condition: null,
+
       hasCompanyInfo: false, // No company info for this user
       company: null // Company object is null
     }, {
@@ -210,6 +218,7 @@ export class AppComponent implements OnInit {
       phoneNumber: '0123456789',
       address: '202 University Ave, Boston, MA',
       languagePreference: 'FR',
+      condition: null,
       hasCompanyInfo: false, // No company info for this user
       company: null // Company object is null
     }
@@ -227,7 +236,10 @@ export class AppComponent implements OnInit {
   }
 
   private sortData(): void {
-    this.users = [...this.users].sort((a, b) => b.dateAdded.getTime() - a.dateAdded.getTime());
+    this.users = [...this.users].sort((a, b) =>
+      new Date(b.dateAdded).getTime() - new Date(a.dateAdded).getTime()
+    );
+
   }
 
   applyFilter(event: Event): void {
@@ -249,6 +261,7 @@ export class AppComponent implements OnInit {
   }
 
   onUserSaved(updatedUser: User): void {
+    console.log(updatedUser);
     const index = this.users.findIndex(u => u.id === updatedUser.id);
     if (index !== -1) {
       this.users = [

@@ -337,6 +337,7 @@
           </div>
         </div>
       </div>
+      <p-button (click)="showTermsAndConditionDialog()" label="Show" />
     </div>
   </div>
 
@@ -354,4 +355,9 @@
       styleClass="p-button-success"
     />
   </ng-template>
+
+  <app-member-terms-modal
+    [(visible)]="showTermsModal"
+    (save)="handleTermsSave($event)"
+  />
 </p-dialog>

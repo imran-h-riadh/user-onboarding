@@ -1,0 +1,24 @@
+<p-dialog [(visible)]="visible" [modal]="true" [style]="{ width: '50rem' }">
+  <ng-template #header>
+    <div class="inline-flex items-center justify-center gap-2">
+      Member Terms & Conditions
+    </div>
+  </ng-template>
+
+  <p-editor [(ngModel)]="terms"></p-editor>
+
+  <ng-template #footer>
+    <p-button
+      label="Cancel"
+      [text]="true"
+      severity="secondary"
+      (click)="onCancel()"
+    />
+    <p-button
+      label="Save"
+      [outlined]="true"
+      severity="primary"
+      (click)="onSave()"
+    />
+  </ng-template>
+</p-dialog>

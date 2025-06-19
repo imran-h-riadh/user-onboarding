@@ -16,6 +16,7 @@ import { MessageService, ConfirmationService } from 'primeng/api';
 import { ToastModule } from 'primeng/toast';
 import { ConfirmDialogModule } from 'primeng/confirmdialog';
 import { GmapComponent } from "../gmap/gmap.component";
+import { MemberTermsModalComponent } from "../member-terms-modal/member-terms-modal.component";
 
 @Component({
   selector: 'app-onboarding-modal',
@@ -36,7 +37,8 @@ import { GmapComponent } from "../gmap/gmap.component";
     CheckboxModule,
     ToastModule,
     ConfirmDialogModule,
-    GmapComponent
+    GmapComponent,
+    MemberTermsModalComponent
   ],
   templateUrl: './onboarding-modal.component.html',
   styleUrls: ['./onboarding-modal.component.css'],
@@ -47,6 +49,7 @@ export class OnboardingModalComponent {
   @Input() visible: boolean = false;
   @Output() visibleChange = new EventEmitter<boolean>();
   @Output() saveConfirmed = new EventEmitter<any>();
+  showTermsModal: boolean = false;
 
   subscriptionOptions = [
     { label: 'Economy Class', value: 'Economy Class', credits: 4500, maxBookings: 2, slots: 2 },
@@ -125,9 +128,6 @@ export class OnboardingModalComponent {
         // User cancelled - do nothing
       }
     });
-    // console.log(this.user);
-    // this.saveConfirmed.emit({ ...this.user });
-    // this.visibleChange.emit(false);
   }
 
   getImageUrl(image: any): string {
@@ -252,4 +252,17 @@ export class OnboardingModalComponent {
       };
     }
   }
+  showTermsAndConditionDialog() {
+
+    this.showTermsModal = true;
+  }
+  handleTermsSave(updatedHtmlTerms: string) {
+    // Create a File object with HTML content
+    const htmlFile = new File([updatedHtmlTerms], 'member-terms.html', {
+      type: 'text/html',
+    });
+
+    this.user.condition = htmlFile;
+  }
+
 }

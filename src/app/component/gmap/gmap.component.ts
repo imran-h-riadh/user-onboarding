@@ -10,7 +10,7 @@ declare const google: any;
   standalone: true,
   imports: [CommonModule, LocationComponent, FormsModule],
   template: `
-  <div #mapContainer style="height: 20px; width:500px"></div>
+  <div #mapContainer style="height: 270px; width:500px"></div>
 
   <div *ngIf="lat() && lng()" style="margin-top: 10px;">
     <app-location
